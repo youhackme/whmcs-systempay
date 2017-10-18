@@ -43,7 +43,7 @@ error_log(json_encode($_POST));
 $success       = $_POST["vads_trans_status"];
 $invoiceId     = $_POST["x_invoice_id"];
 $transactionId = $_POST["vads_trans_uuid"];
-$paymentAmount = $_POST["200"];
+$paymentAmount = $_POST["vads_amount"];
 $paymentFee    = '0';
 $hash          = $_POST["signature"];
 

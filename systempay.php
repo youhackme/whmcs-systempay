@@ -108,7 +108,6 @@ function systempay_config()
  */
 function systempay_link($params)
 {
-    error_log('P rentrer..');
 
     // Gateway Configuration Parameters
     // SystemPay site id
@@ -120,9 +119,11 @@ function systempay_link($params)
         $certificateKey = $params['certificateTest'];
     }
 
+
     // Invoice Parameters
     $invoiceId = $params['invoiceid'];
     $amount    = $params['amount'];
+    $orderId   = $params['invoicenum'];
 
     // Client Parameters
     $firstname = $params['clientdetails']['firstname'];
@@ -172,7 +173,8 @@ function systempay_link($params)
               ->set_url_return($returnUrl)
               ->set_url_check($callbackUrl)
               ->set_ctx_mode($mode)
-              ->set_shop_url($systemUrl);
+              ->set_shop_url($systemUrl)
+              ->set_order_id($orderId);
 
     //create the signature based on the certificate key
     $systempay->set_signature($certificateKey);
