@@ -1,0 +1,13 @@
+{
+  "require": {
+    "php": ">=5.3.9"
+  },
+  "autoload": {
+    "psr-4": {
+      "Systempay\\": "src/"
+    },
+    "files": [
+      "helpers.php"
+    ]
+  }
+}
