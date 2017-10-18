@@ -1,2 +1,2 @@
-# whmcs-systempay
-WHMCS Systempay
+# WHMCS Systempay module
+Coming soon.
