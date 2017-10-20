@@ -49,7 +49,7 @@ function sign($parameters, $key, $hashed = true)
 }
 
 
-error_log(json_encode($_POST));
+
 
 
 // Retrieve data returned in payment gateway callback
@@ -138,7 +138,6 @@ if ($success) {
      * @param string $gatewayModule Gateway module name
      */
 
-    error_log($paymentAmount/100);
 
     addInvoicePayment(
         $invoiceId,
