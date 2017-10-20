@@ -52,7 +52,6 @@ function sign($parameters, $key, $hashed = true)
 error_log(json_encode($_POST));
 
 
-
 // Retrieve data returned in payment gateway callback
 // Varies per payment gateway
 $success       = $_POST["vads_trans_status"];
@@ -138,10 +137,13 @@ if ($success) {
      * @param float  $paymentFee    Payment fee (optional)
      * @param string $gatewayModule Gateway module name
      */
+
+    error_log($paymentAmount/100);
+
     addInvoicePayment(
         $invoiceId,
         $transactionId,
-        $paymentAmount,
+        null,
         $paymentFee,
         $gatewayModuleName
     );
