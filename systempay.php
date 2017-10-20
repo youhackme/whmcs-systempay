@@ -148,6 +148,7 @@ function systempay_link($params)
     //Callback url for server-to-server communication
     $callbackUrl = $systemUrl . '/modules/gateways/callback/' . $moduleName . '.php';
 
+    // Default configuration
     $systempay = (new \Systempay\Systempay())->set_params(
         [
             'vads_page_action'    => 'PAYMENT',

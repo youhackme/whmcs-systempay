@@ -33,19 +33,36 @@ if ( ! $gatewayParams['type']) {
     die("Module Not Activated");
 }
 
+function sign($parameters, $key, $hashed = true)
+{
+    $signContent = "";
+    ksort($parameters);
+    foreach ($parameters as $name => $value) {
+        if (substr($name, 0, 5) == 'vads_') {
+            $signContent .= $value . '+';
+        }
+    }
+    $signContent .= $key;
+    $sign        = $hashed ? sha1($signContent) : $signContent;
+
+    return $sign;
+}
+
+
 error_log(json_encode($_POST));
 
-//{"vads_amount":"400","vads_auth_mode":"FULL","vads_auth_number":"3fdabf","vads_auth_result":"00","vads_capture_delay":"0","vads_card_brand":"CB","vads_card_number":"497010XXXXXX0014","vads_payment_certificate":"88cfef1f12571184e1fc9fcf9ecfa165d9f14447","vads_ctx_mode":"TEST","vads_currency":"978","vads_effective_amount":"400","vads_effective_currency":"978","vads_site_id":"41609008","vads_trans_date":"20171018135302","vads_trans_id":"000049","vads_trans_uuid":"92baf8e56e76446d8dbbd87c2d72fefd","vads_validation_mode":"0","vads_version":"V2","vads_warranty_result":"YES","vads_payment_src":"EC","vads_order_id":"49","vads_cust_id":"4","vads_cust_name":"Hyder Abbass Bangash","vads_cust_last_name":"Hyder Abbass Bangash","vads_cust_address":"Morcellement Seetaram, Henrietta, Vacoas","vads_cust_zip":"12345","vads_cust_city":"vacoas","vads_cust_country":"MU","vads_cust_phone":"57990900","vads_sequence_number":"1","vads_contract_used":"8800268","vads_trans_status":"AUTHORISED","vads_expiry_month":"6","vads_expiry_year":"2018","vads_bank_code":"17807","vads_bank_product":"F","vads_pays_ip":"FR","vads_presentation_date":"20171018135309","vads_effective_creation_date":"20171018135309","vads_operation_type":"DEBIT","vads_threeds_enrolled":"Y","vads_threeds_cavv":"Q2F2dkNhdnZDYXZ2Q2F2dkNhdnY=","vads_threeds_eci":"05","vads_threeds_xid":"SlRUSG9xNlJNNzVvRldKOGpSY3U=","vads_threeds_cavvAlgorithm":"2","vads_threeds_status":"Y","vads_threeds_sign_valid":"1","vads_threeds_error_code":"","vads_threeds_exit_status":"10","vads_result":"00","vads_extra_result":"","vads_card_country":"FR","vads_language":"en","vads_hash":"d69b8739252c5461f49d4322005c0a7931c0da5d2dd03f41452056c1cd212333","vads_url_check_src":"PAY","vads_action_mode":"INTERACTIVE","vads_payment_config":"SINGLE","vads_page_action":"PAYMENT","vads_shop_url":"https:\\/\\/cloud.stellatelecom.com\\/","signature":"d813a2706d50976667afb660bce3e72af3cb3d47"}
 
 
 // Retrieve data returned in payment gateway callback
 // Varies per payment gateway
 $success       = $_POST["vads_trans_status"];
-$invoiceId     = $_POST["x_invoice_id"];
+$invoiceId     = $_POST["vads_order_id"];
 $transactionId = $_POST["vads_trans_uuid"];
 $paymentAmount = $_POST["vads_amount"];
 $paymentFee    = '0';
 $hash          = $_POST["signature"];
+$environment   = $_POST['vads_ctx_mode'];
+
 
 $transactionStatus = ($success == 'AUTHORISED') ? 'Success' : 'Failure';
 
@@ -56,10 +73,15 @@ $transactionStatus = ($success == 'AUTHORISED') ? 'Success' : 'Failure';
  * originated from them. In the case of our example here, this is achieved by
  * way of a shared secret which is used to build and compare a hash.
  */
-$secretKey = $gatewayParams['secretKey'];
-if ($hash != md5($invoiceId . $transactionId . $paymentAmount . $secretKey)) {
-    $transactionStatus = 'Hash Verification Failure';
+$secretKey = $gatewayParams['certificateProd'];
+
+if ($environment == 'TEST') {
+    $secretKey = $gatewayParams['certificateTest'];
+}
+
+if (sign($_POST, $secretKey) == $POST['signature']) {
     $success           = false;
+    $transactionStatus = 'Hash Verification Failure.';
 }
 
 /**
